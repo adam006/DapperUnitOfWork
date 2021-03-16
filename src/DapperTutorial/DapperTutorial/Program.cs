@@ -51,7 +51,9 @@ namespace DapperTutorial
 
         public static void ResetDb()
         {
-            using var sqlConn = new SqlConnection(_connection);
+            var conn = new SqlConnectionStringBuilder(_connection);
+            conn.InitialCatalog = "master";
+            using var sqlConn = new SqlConnection(conn.ConnectionString);
             var fileInfo = new FileInfo("dapper.sql");
             var script = fileInfo.OpenText().ReadToEnd();
 
