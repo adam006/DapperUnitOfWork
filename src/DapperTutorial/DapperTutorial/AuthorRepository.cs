@@ -6,6 +6,7 @@ namespace DapperTutorial
 {
     public interface IAuthorRepository :  IRepository<Author>
     {
+        Author GetAuthorWithBooks(int id);
     }
 
     public class AuthorRepository : IAuthorRepository
@@ -38,13 +39,13 @@ namespace DapperTutorial
 
         public void AddRange(IEnumerable<Author> entities)
         {
-            // var list = entities.ToList();
-            // var sql = "insert into author (name) values(@Name); select scope_identity();";
-            // var result = _context.Connection.QueryMultiple(sql, list, _context.Transaction);
-            // foreach (var author in list)
-            // {
-            //     author.Id = result.ReadFirst<int>();
-            // }
+            foreach (var entity in entities)
+            {
+                var sql = "insert into author (name) values(@Name); select scope_identity();";
+                var id = _context.Connection.QueryFirst<int>(sql,
+                    new {entity.Name}, _context.Transaction);
+                entity.Id = id;
+            }
         }
 
         public void Remove(Author entity)
@@ -58,6 +59,29 @@ namespace DapperTutorial
             var ids = entities.Select(s => s.Id);
             var sql = "delete from author where id in @ids";
             _context.Connection.Execute(sql, new {ids}, _context.Transaction);
+        }
+
+        public Author GetAuthorWithBooks(int id)
+        {
+            var sql = @"SELECT * 
+                        FROM Author a
+                        JOIN Book b on a.id = b.authorid
+                        WHERE a.id = @id";
+
+            var results = new Dictionary<int, Author>();
+            var a = _context.Connection.Query<Author, Book, Author>(sql, param:new {id}, map:(author, book) =>
+            {
+                Author authorEntry;
+                if (!results.TryGetValue(author.Id, out authorEntry))
+                {
+                    results.Add(author.Id, author);
+                    authorEntry = author;
+                }
+
+                authorEntry.Books.Add(book);
+                return authorEntry;
+            }, transaction: _context.Transaction);
+            return a.Single();
         }
     }
 }

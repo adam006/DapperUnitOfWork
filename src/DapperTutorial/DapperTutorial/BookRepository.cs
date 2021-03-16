@@ -38,13 +38,13 @@ namespace DapperTutorial
 
         public void AddRange(IEnumerable<Book> entities)
         {
-            // var list = entities.ToList();
-            // var sql = "insert into Book (title, price, authorid) values(@Title, @Price, @AuthorId); select scope_identity();";
-            // var result = _context.Connection.QueryMultiple(sql, list, _context.Transaction);
-            // foreach (var book in list)
-            // {
-            //     book.Id = result.ReadFirst<int>();
-            // }
+            foreach (var entity in entities)
+            {
+                var sql = "insert into Book (title, price, authorid) values(@Title, @Price, @AuthorId); select scope_identity();";
+                var id = _context.Connection.QueryFirst<int>(sql,
+                    new {entity.Title, entity.Price, entity.AuthorId}, _context.Transaction);
+                entity.Id = id;
+            }
         }
 
         public void Remove(Book entity)
