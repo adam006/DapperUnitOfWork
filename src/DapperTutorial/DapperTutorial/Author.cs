@@ -7,7 +7,6 @@ using Microsoft.Data.SqlClient;
 
 namespace DapperTutorial
 {
-    [Table("Authors")]
     public class Author
     {
         public int Id { get; set; }

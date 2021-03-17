@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -321,6 +322,19 @@ namespace DapperTutorial
             {
                 Console.WriteLine($"********{authorBook.Title}");
             }
+        }
+
+        public static void SetupDapperMap<T>()
+        {
+            Dapper.SqlMapper.SetTypeMap(
+                typeof(T),
+                new Dapper.CustomPropertyTypeMap(
+                    typeof(T),
+                    (type, columnName) =>
+                        type.GetProperties().FirstOrDefault(prop =>
+                            prop.GetCustomAttributes(false)
+                                .OfType<ColumnAttribute>()
+                                .Any(attr => attr.Name == columnName) || prop.Name.Equals(columnName, StringComparison.OrdinalIgnoreCase))));
         }
     }
 }
