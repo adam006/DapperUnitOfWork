@@ -58,3 +58,13 @@ INSERT INTO Dapper.dbo.Book (Id, Title, Price, AuthorId) VALUES (5, N'Somehow I 
 
 set identity_insert dbo.book off
 go
+
+CREATE PROCEDURE dbo.uspGetBookByTitle
+    @title varchar(100)
+AS
+
+    SET NOCOUNT ON;
+    SELECT *
+    FROM Book
+    WHERE Title = @title
+GO

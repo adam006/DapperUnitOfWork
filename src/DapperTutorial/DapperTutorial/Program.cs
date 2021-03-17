@@ -18,7 +18,6 @@ namespace DapperTutorial
 
         static void Main(string[] args)
         {
-
         }
 
         public static void UnitOfWork()
