@@ -1,6 +1,3 @@
-using System;
-using System.Data;
-
 namespace DapperTutorial
 {
     public interface IUnitOfWorkDapper

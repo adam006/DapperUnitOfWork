@@ -38,6 +38,7 @@ namespace DapperTutorial
             uow.Books.Add(list.First());
             
             var books = uow.Books.GetAll();
+            uow.Complete();
             
             PrintAuthors(authors);
             PrintBooks(books);
@@ -152,7 +153,7 @@ namespace DapperTutorial
 
         public static int GetBookId()
         {
-            var sql = "SELECT TOP(1) FROM Book";
+            var sql = "SELECT TOP(1) * FROM Book";
 
             using var sqlConn = new SqlConnection(_connection);
             var id = sqlConn.QuerySingle<int>(sql);
@@ -190,7 +191,7 @@ namespace DapperTutorial
             
             var id = 1;
             var sql = @"UPDATE Book
-                        SET title = @bookTitel 
+                        SET title = @bookTitle
                         WHERE id = @id";
 
             var title = "Awesome New Title";
