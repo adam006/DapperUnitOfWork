@@ -18,7 +18,6 @@ namespace DapperTutorial
 
         static void Main(string[] args)
         {
-            ResetDb();
         }
 
         public static void UnitOfWork()
@@ -36,7 +35,7 @@ namespace DapperTutorial
             var list = new List<Book>();
             list.Add(new Book{Price = 10, Title = "a wild rarment", AuthorId = authors.First().Id});
             list.Add(new Book{Price = 10, Title = "a wild rarment part 2", AuthorId = authors.First().Id});
-            uow.Books.Add(list.First());
+            uow.Books.AddRange(list);
             
             var books = uow.Books.GetAll();
             uow.Complete();
@@ -168,7 +167,7 @@ namespace DapperTutorial
             var sql = "INSERT INTO Book values(@title, @price, @authorId)";
 
             using var sqlConn = new SqlConnection(_connection);
-            sqlConn.Execute(sql, new {title = "New Book 5000", price = 19.99, id = authorId});
+            sqlConn.Execute(sql, new {title = "New Book 5000", price = 19.99, authorId});
         }
 
         public static void InsertMultipleBooks()
@@ -189,7 +188,6 @@ namespace DapperTutorial
         {
             using var sqlConn = new SqlConnection(_connection);
             
-            
             var id = 1;
             var sql = @"UPDATE Book
                         SET title = @bookTitle
@@ -201,13 +199,13 @@ namespace DapperTutorial
             
             parms.Add("id", 1, DbType.Int32);
             parms.Add("bookTitle", title, DbType.String);
-            sqlConn.Execute(sql, parms);
+            var result = sqlConn.Execute(sql, parms);
+            Console.WriteLine("Rows affected: " + result);
         }
 
         public static void DeleteBook()
         {
             using var sqlConn = new SqlConnection(_connection);
-            
             
             var id = 1;
             var sql = @"DELETE FROM Book 
@@ -295,7 +293,7 @@ namespace DapperTutorial
         {
             foreach (var book in books)
             {
-                Console.WriteLine($"book title: {book.Title}");
+                Console.WriteLine($"book title: {book.Title} - id: {book.Id}");
             }
         }
         
