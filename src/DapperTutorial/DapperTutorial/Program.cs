@@ -18,6 +18,7 @@ namespace DapperTutorial
 
         static void Main(string[] args)
         {
+            ResetDb();
         }
 
         public static void UnitOfWork()

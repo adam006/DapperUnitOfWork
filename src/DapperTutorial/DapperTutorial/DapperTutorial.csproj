@@ -17,4 +17,11 @@
       <None Remove="northwinds.sql" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="dapper.sql" />
+      <Content Include="dapper.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
 </Project>
