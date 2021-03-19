@@ -18,8 +18,8 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Restore dependencies
-      run: dotnet restore ../../src/DapperTutorial/DapperTutorial.sln
+      run: dotnet restore DapperTutorial.csproj
     - name: Build
-      run: dotnet build --no-restore ../../src/DapperTutorial/DapperTutorial.sln
+      run: dotnet build --no-restore DapperTutorial.csproj
     - name: Test
-      run: dotnet test --no-build --verbosity normal ../../src/DapperTutorial/DapperTutorial.sln
+      run: dotnet test --no-build --verbosity normal DapperTutorial.csproj
