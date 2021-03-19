@@ -1,4 +1,4 @@
-# DapperUnitOfWork
+# Dapper Unit Of Work with Repository Pattern
 
 This is a simple example of a Unit of Work with Repository Pattern for Dapper.
 
