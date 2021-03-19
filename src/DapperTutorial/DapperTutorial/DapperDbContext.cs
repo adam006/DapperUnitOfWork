@@ -3,17 +3,16 @@ using System.Data;
 
 namespace DapperTutorial
 {
-    public interface IDapperDbContext
+    public interface IDapperDbContext : IDisposable
     {
         IDbTransaction Transaction { get; }
         IDbConnection Connection { get; }
         void BeginTransaction();
         void Commit();
         void Rollback();
-        void Dispose();
     }
 
-    public class DapperDbContext : IDisposable, IDapperDbContext
+    public class DapperDbContext : IDapperDbContext
     {
         public IDbTransaction Transaction { get; private set; }
 

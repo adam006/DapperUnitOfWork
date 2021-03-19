@@ -10,7 +10,7 @@ using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
 namespace DapperTutorial
 {
-    class Program
+    public class Program
     {
         private static readonly string _connection =
             "Data Source=127.0.0.1;User ID=sa;Password=Password@12345;Database=Dapper;";
@@ -187,8 +187,7 @@ namespace DapperTutorial
         public static void UpdateBook()
         {
             using var sqlConn = new SqlConnection(_connection);
-            
-            var id = 1;
+
             var sql = @"UPDATE Book
                         SET title = @bookTitle
                         WHERE id = @id";
