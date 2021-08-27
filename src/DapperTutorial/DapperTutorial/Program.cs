@@ -8,16 +8,33 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
+
 namespace DapperTutorial
 {
     public class Program
     {
         private static readonly string _connection =
             "Data Source=127.0.0.1;User ID=sa;Password=Password@12345;Database=Dapper;";
-
-
+        
         static void Main(string[] args)
         {
+            ResetDb();
+            // GetAuthors();
+            // GetBooks();
+            // InsertAuthor();
+            // InsertBook();
+            // InsertMultipleBooks();
+            // UpdateAuthor();
+            // UpdateBook();
+            // DeleteBook();
+            // InStatement();
+            // GetBooksWithAuthors();
+            GetAuthorWithBooks();
+            // CallStoredProc();
+            // MultiInsert();
+            // QueryMultiple();
+            // Transactions();
+            // UnitOfWork();
         }
 
         public static void UnitOfWork()
@@ -33,17 +50,17 @@ namespace DapperTutorial
 
             uow.Begin();
             var list = new List<Book>();
-            list.Add(new Book{Price = 10, Title = "a wild rarment", AuthorId = authors.First().Id});
-            list.Add(new Book{Price = 10, Title = "a wild rarment part 2", AuthorId = authors.First().Id});
+            list.Add(new Book {Price = 10, Title = "a wild rarment", AuthorId = authors.First().Id});
+            list.Add(new Book {Price = 10, Title = "a wild rarment part 2", AuthorId = authors.First().Id});
             uow.Books.AddRange(list);
-            
+
             var books = uow.Books.GetAll();
             uow.Complete();
-            
+
             PrintAuthors(authors);
             PrintBooks(books);
         }
-        
+
         public static SqlConnection GetConnection()
         {
             var sqlConn = new SqlConnection(_connection);
@@ -61,14 +78,14 @@ namespace DapperTutorial
             var server = new Server(new ServerConnection(sqlConn));
             server.ConnectionContext.ExecuteNonQuery(script);
         }
-        
+
         public static void GetAuthors()
         {
             using var sqlConn = new SqlConnection(_connection);
-            var authors = sqlConn.Query<Author>("SELECT * FROM Author").ToList();
+            var authors = sqlConn.Query<Author>("SELECT * FROM Author where 1<>1").ToList();
             PrintAuthors(authors);
         }
-       
+
         public static int GetAuthorId()
         {
             var sql = "SELECT TOP(1) id FROM Author";
@@ -110,7 +127,7 @@ namespace DapperTutorial
         public static void GetBooksWithAuthors()
         {
             using var sqlConn = new SqlConnection(_connection);
-            
+
             var sql = @"SELECT * 
                         FROM Book b
                         JOIN Author a on a.id = b.authorId";
@@ -127,7 +144,7 @@ namespace DapperTutorial
         public static void GetAuthorWithBooks()
         {
             using var sqlConn = new SqlConnection(_connection);
-            
+
             var sql = @"SELECT * 
                         FROM Author a
                         JOIN Book b on a.id = b.authorId";
@@ -145,7 +162,7 @@ namespace DapperTutorial
                 authorEntry.Books.Add(book);
                 return authorEntry;
             });
-            foreach (var author in authors)
+            foreach (var author in results.Values.ToList())
             {
                 PrintAuthorAndBooks(author);
             }
@@ -195,7 +212,7 @@ namespace DapperTutorial
             var title = "Awesome New Title";
 
             var parms = new DynamicParameters();
-            
+
             parms.Add("id", 1, DbType.Int32);
             parms.Add("bookTitle", title, DbType.String);
             var result = sqlConn.Execute(sql, parms);
@@ -205,7 +222,7 @@ namespace DapperTutorial
         public static void DeleteBook()
         {
             using var sqlConn = new SqlConnection(_connection);
-            
+
             var id = 1;
             var sql = @"DELETE FROM Book 
                         WHERE id = @id";
@@ -255,7 +272,6 @@ namespace DapperTutorial
             var sql = @"INSERT INTO Author([name]) values(@Name)";
             var result = sqlConn.Execute(sql, authors);
             Console.WriteLine(result);
-
         }
 
         public static void QueryMultiple()
@@ -264,7 +280,7 @@ namespace DapperTutorial
                         from Author;
                         select *
                         from Book;";
-            
+
             using var sqlConn = new SqlConnection(_connection);
             var result = sqlConn.QueryMultiple(sql);
             var authors = result.Read<Author>();
@@ -287,7 +303,7 @@ namespace DapperTutorial
             sqlConn.Execute(sql, new {id, title}, transaction: transaction);
             transaction.Commit();
         }
-        
+
         private static void PrintBooks(IEnumerable<Book> books)
         {
             foreach (var book in books)
@@ -295,7 +311,7 @@ namespace DapperTutorial
                 Console.WriteLine($"book title: {book.Title} - id: {book.Id}");
             }
         }
-        
+
         private static void PrintBooksWithAuthor(IEnumerable<Book> books)
         {
             foreach (var book in books)
@@ -332,7 +348,8 @@ namespace DapperTutorial
                         type.GetProperties().FirstOrDefault(prop =>
                             prop.GetCustomAttributes(false)
                                 .OfType<ColumnAttribute>()
-                                .Any(attr => attr.Name == columnName) || prop.Name.Equals(columnName, StringComparison.OrdinalIgnoreCase))));
+                                .Any(attr => attr.Name == columnName) ||
+                            prop.Name.Equals(columnName, StringComparison.OrdinalIgnoreCase))));
         }
     }
 }
