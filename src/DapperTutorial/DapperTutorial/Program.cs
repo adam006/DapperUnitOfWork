@@ -14,8 +14,8 @@ namespace DapperTutorial
     public class Program
     {
         private static readonly string _connection =
-            "Data Source=127.0.0.1;User ID=sa;Password=Password@12345;Database=Dapper;";
-        
+            "Data Source=127.0.0.1;User ID=sa;Password=Password@12345;Database=Dapper;trustServerCertificate=true";
+
         static void Main(string[] args)
         {
             ResetDb();
@@ -42,7 +42,7 @@ namespace DapperTutorial
             var conn = GetConnection();
 
             using var context = new DapperDbContext(conn);
-            var uow = new UnitOfWorkDapper(context, new BookRepository(context), new AuthorRepository(context));
+            var uow = new UnitOfWorkDapper(context, new RepositoryFactory());
 
             uow.Begin();
             var authors = uow.Authors.GetAll().ToList();
@@ -50,8 +50,8 @@ namespace DapperTutorial
 
             uow.Begin();
             var list = new List<Book>();
-            list.Add(new Book {Price = 10, Title = "a wild rarment", AuthorId = authors.First().Id});
-            list.Add(new Book {Price = 10, Title = "a wild rarment part 2", AuthorId = authors.First().Id});
+            list.Add(new Book { Price = 10, Title = "a wild rarment", AuthorId = authors.First().Id });
+            list.Add(new Book { Price = 10, Title = "a wild rarment part 2", AuthorId = authors.First().Id });
             uow.Books.AddRange(list);
 
             var books = uow.Books.GetAll();
@@ -99,7 +99,7 @@ namespace DapperTutorial
         {
             var sql = @"INSERT INTO Author values (@name)";
             using var sqlConn = new SqlConnection(_connection);
-            sqlConn.Execute(sql, new {name = "New Author"});
+            sqlConn.Execute(sql, new { name = "New Author" });
         }
 
         public static void UpdateAuthor()
@@ -109,7 +109,7 @@ namespace DapperTutorial
             var updateSql = "UPDATE Author SET Name = @name WHERE Id = @id";
 
             using var sqlConn = new SqlConnection(_connection);
-            var rowsAffected = sqlConn.Execute(updateSql, new {name = "Sally", id});
+            var rowsAffected = sqlConn.Execute(updateSql, new { name = "Sally", id });
 
             Console.WriteLine($"Rows affected : {rowsAffected}");
         }
@@ -184,7 +184,7 @@ namespace DapperTutorial
             var sql = "INSERT INTO Book values(@title, @price, @authorId)";
 
             using var sqlConn = new SqlConnection(_connection);
-            sqlConn.Execute(sql, new {title = "New Book 5000", price = 19.99, authorId});
+            sqlConn.Execute(sql, new { title = "New Book 5000", price = 19.99, authorId });
         }
 
         public static void InsertMultipleBooks()
@@ -196,8 +196,8 @@ namespace DapperTutorial
             sqlConn.Execute(sql,
                 new[]
                 {
-                    new {title = "New Book 5000", price = 19.99, authorId},
-                    new {title = "Another New Book", price = 5.99, authorId}
+                    new { title = "New Book 5000", price = 19.99, authorId },
+                    new { title = "Another New Book", price = 5.99, authorId }
                 });
         }
 
@@ -229,7 +229,7 @@ namespace DapperTutorial
 
             var title = "Awesome New Title";
 
-            sqlConn.Execute(sql, new {id, title});
+            sqlConn.Execute(sql, new { id, title });
         }
 
         public static void CallStoredProc()
@@ -246,10 +246,10 @@ namespace DapperTutorial
 
         public static void InStatement()
         {
-            var ids = new List<int> {1, 2, 3, 4};
+            var ids = new List<int> { 1, 2, 3, 4 };
             var sql = "SELECT * FROM Author WHERE id IN @ids";
             using var sqlConn = new SqlConnection(_connection);
-            var authors = sqlConn.Query<Author>(sql, new {ids});
+            var authors = sqlConn.Query<Author>(sql, new { ids });
             PrintAuthors(authors);
         }
 
@@ -300,7 +300,7 @@ namespace DapperTutorial
 
             var title = "Awesome New Title";
 
-            sqlConn.Execute(sql, new {id, title}, transaction: transaction);
+            sqlConn.Execute(sql, new { id, title }, transaction: transaction);
             transaction.Commit();
         }
 
